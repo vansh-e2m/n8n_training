@@ -1,0 +1,65 @@
+{
+  "name": "hello world",
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "console.log('Hello World');\nreturn [{ message: 'Hello World' }];"
+      },
+      "name": "Print Hello World",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -160
+      ],
+      "id": "033ffaea-fa15-432a-b3ee-ca24a434cba3"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        }
+      },
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -160
+      ],
+      "id": "383bc5da-5cbb-446e-b3d8-a1edcf7b0364"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Print Hello World",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e6278f4c-6c0b-4aa8-b74d-43550b5879e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e323ee71049035319143710b9ce7f323d74ae6214eb75ab07286bec8fec2ea7"
+  },
+  "id": "5wBfUB9IekD-n4X21maLM",
+  "tags": []
+}
