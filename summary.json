@@ -1,0 +1,266 @@
+{
+  "name": "github-summary",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -592,
+        -80
+      ],
+      "id": "538fc44b-4e90-4c58-96bc-b28ae254263b",
+      "name": "When chat message received",
+      "webhookId": "def93690-40a8-4469-b01b-2c781eb9d699"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f415ff86-c4d3-4e76-84a6-c13f86e9e469",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "^https:\\/\\/github\\.com\\/[^\\/]+\\/[^\\/]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -384,
+        -80
+      ],
+      "id": "9f71d6cf-16d6-4ed4-8421-3ec34fdae292",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following GitHub repository:\n\n{{ $json.chatInput }}\n\nReturn the response strictly in the following JSON format:\n\n{\n  \"summary\": \"Short high-level summary of the repository\",\n  \"tags\": [\"tag1\", \"tag2\", \"tag3\"],\n  \"technologies_used\": [\"technology1\", \"technology2\"],\n  \"functionality\": [\n    \"What the project does\",\n    \"Key capabilities or features\"\n  ]\n}\n",
+        "options": {
+          "systemMessage": "You are a technical assistant that analyzes GitHub repositories.\n\nRules:\n- Be concise and factual\n- Do not hallucinate features\n- Do not mention that you are an AI\n- Do not include markdown or explanations\n- Always return valid JSON only\n- Follow the output schema exactly\n\nIf repository details are unclear, infer conservatively.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "59124846-74c0-4493-ae34-3c591466eff4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "allenai/molmo-2-8b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        112
+      ],
+      "id": "fecd75a7-b637-49b6-ab57-7172a4b90eab",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ha7TicgE1Z8qjOOy",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = JSON.parse($json.output);\n\nreturn [\n  {\n    json: {\n      summary: parsed.summary, // already a string\n\n      tags: Array.isArray(parsed.tags)\n        ? parsed.tags.join(\", \")\n        : parsed.tags,\n\n      technologies_used: Array.isArray(parsed.technologies_used)\n        ? parsed.technologies_used.join(\", \")\n        : parsed.technologies_used,\n\n      functionality: Array.isArray(parsed.functionality)\n        ? parsed.functionality.join(\"; \")\n        : parsed.functionality\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "31b6c8cb-41f8-42fd-a841-987d82b63fbd",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1oq9ARb318KjOXwrFF4i8aHkpsjfyY5kFL3T2E2iVUKU",
+          "mode": "list",
+          "cachedResultName": "git-summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oq9ARb318KjOXwrFF4i8aHkpsjfyY5kFL3T2E2iVUKU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oq9ARb318KjOXwrFF4i8aHkpsjfyY5kFL3T2E2iVUKU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Repo link": "={{ $('If').item.json.chatInput }}",
+            "Tags": "={{ $json.tags }}",
+            "Summary": "={{ $json.summary }}",
+            "Technologies Used": "={{ $json.technologies_used }}",
+            "Functionallity": "={{ $json.functionality }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Repo link",
+              "displayName": "Repo link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tags",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Technologies Used",
+              "displayName": "Technologies Used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Functionallity",
+              "displayName": "Functionallity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "a3790c49-7db1-43fe-9800-ba9270c24b06",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "M4zDZaoKpL65Bp2v",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "a6994867-cbe3-487d-a174-155467c3ea1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e323ee71049035319143710b9ce7f323d74ae6214eb75ab07286bec8fec2ea7"
+  },
+  "id": "5fNlmG61Wdl7JarlLU3gp",
+  "tags": []
+}
